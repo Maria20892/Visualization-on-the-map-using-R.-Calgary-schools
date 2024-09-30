@@ -1,0 +1,204 @@
+---
+title: "final_191892"
+author: "Mariia Shekhovtsova"
+date: "2024-01-16"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Final Assignment task:
+
+Analyzing number of schools
+a. Find information about schools for a city you will choose (it can be any city
+from anywhere).
+i. Lat-long information
+ii. Any other information about schools would be appreciated e.g.
+number of teachers, students
+b. Create a leaflet map and show schools as a point.
+c. Have a pop-up menu per each point. Each pop-up should show
+i. Name of the school
+ii. Name of the city where the school is located.
+
+
+```{r libraries, include=FALSE}
+#install.packages("ggplot2")
+#install.packages("ggmap")
+#install.packages("maps")
+#install.packages("mapdata")
+#install.packages("leaflet")
+#install.packages("sf")
+#install.packages("RColorBrewer")
+
+library(ggplot2)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(leaflet)
+library(sf)
+library(RColorBrewer)
+library(mapboxapi)
+library(mapdeck)
+```
+
+##  49 schools in Calgary, Canada.
+For 49 schools of Calgary, Canada, I am going to make a leaflet map and show schools as a point with a pop-up menu, 
+where city, school name, level and grade would appear.
+
+Next, I'm going to add isochrone to see from which places it is possible to reach a school by car in 3 minutes.
+Such information is important for making good choice and for time planing.
+
+## Creating school data set, Passing mapbox token for isochrone
+Data set contains 
+1. name, 
+2. longitude, 
+3. latitude 
+and also special parameters: 
+4.Level (High school, Middle and Elementary)
+5.Max_Grade 
+
+```{r ex1, echo=TRUE, fig.keep='all'}
+# School names
+school_names <- c(
+  "Crescent Heights High School", "Jack James High School", "Lord Beaverbrook High School",
+  "Maple Ridge School", "Robert Warren School", "Woodlands School", "Nickle School",
+  "McKenzie Lake School", "Altadore School", "Central Memorial High School",
+  "Glenbrook School", "Riverbend School", "Sherwood School", "Western Canada High School",
+  "Earl Grey School", "Colonel Walker School", "Abbeydale School", "Chris Akkerman School",
+  "Douglas Harkness School", "Forest Lawn High School", "Sir Wilfrid Laurier School",
+  "Taradale School", "West Dover School", "Radisson Park School", "Lester B. Pearson High School",
+  "AADAC", "Alex Munro School", "Beddington Heights School", "Buchanan School",
+  "Catherine Nichols Gunn School", "Coventry Hills School", "Alice Jamieson Girls' Academy",
+  "Christine Meikle School", "James Fowler High School", "John G. Diefenbaker High School",
+  "Senator Patrick Burns School", "William Aberhart High School", "Arbour Lake School",
+  "Belvedere Parkway School", "Citadel Park School", "Hawkwood School", "Royal Oak School",
+  "Dalhousie School", "Simon Fraser School", "Thomas B. Riley School", "Varsity Acres School",
+  "Silver Springs School", "Scenic Acres School", "Dr. Gordon Townsend"
+)
+
+# Latitude
+latitude <- c(
+  51.06171952, 51.05200665, 50.98073203, 50.98521341, 50.9426456, 50.93867223, 50.9411272,
+  50.90674808, 51.0140955, 51.00847758, 51.023858, 50.97267535, 50.99405213, 51.03742272,
+  51.03130068, 51.03465332, 51.05683801, 51.06415153, 51.07395873, 51.04293213, 51.04599811,
+  51.12124767, 51.02633759, 51.04630676, 51.07704003, 51.04366864, 51.12082529, 51.13185073,
+  51.08574386, 51.11191215, 51.16553899, 51.06001766, 51.05814405, 51.08685408, 51.11291947,
+  51.08857701, 51.07893976, 51.13457405, 51.09313301, 51.14588387, 51.13050944, 51.14561526,
+  51.110415, 51.11584488, 51.08790163, 51.0912053, 51.10599196, 51.12033693, 51.07476395
+)
+
+# Longitude
+longitude <- c(
+  -114.0654495, -113.9626091, -114.0621727, -114.0499064, -114.0852237, -114.1077005, -114.0615664,
+  -113.9847679, -114.0992716, -114.1138061, -114.1549649, -114.0185411, -114.0117466, -114.0772103,
+  -114.0822129, -114.0191304, -113.929612, -113.9635133, -113.9460222, -113.9695208, -113.988828,
+  -113.9379524, -113.9906314, -113.9923809, -113.9569991, -114.0770105, -114.0612257, -114.0793795,
+  -114.0627841, -114.0579054, -114.0514432, -114.0477123, -114.038277, -114.069975, -114.0702163,
+  -114.1153224, -114.1150039, -114.2093393, -114.2112563, -114.1733239, -114.1788549, -114.2224024,
+  -114.1496443, -114.1416607, -114.1887857, -114.1473831, -114.1910001, -114.2155934, -114.1482353
+)
+
+# School Level
+level <- c(
+  "High School", "High School", "High School", "Elementary", "Middle", "Elementary", "Middle",
+  "Elementary", "Elementary", "High School", "Elementary", "Elementary", "Middle", "High School",
+  "Elementary", "Elementary", "Elementary", "Elementary", "Middle", "High School", "Middle",
+  "Elementary", "Elementary", "Elementary", "High School", "Special", "Elementary", "Elementary",
+  "Elementary", "Elementary", "Elementary", "Elementary", "Middle", "Special", "High School",
+  "High School", "Middle", "High School", "Middle", "Middle", "Elementary", "Elementary",
+  "Elementary", "Middle", "Middle", "Elementary", "Elementary", "Elementary", "Special"
+)
+
+# Grade
+max_grade <- c(
+  12,12,12,4,9,6,9,4,6,12,6,6,9,12,6,6,6,4,6,12,9,6,6,4,12,12,
+  6,6,6,6,4,9,15,12,12,9,12,9,6,4,6,6,4,9,9,6,6,4,15)
+
+# data frame 
+schools <- data.frame(
+  school = school_names,
+  latitude = latitude,
+  longitude = longitude,
+  level = level,
+  max_grade = max_grade
+)
+
+calgary_coordinates <- c(51.05011, -114.08529)
+
+# Passing mapbox token
+Sys.setenv(MAPBOX_API_KEY = "pk.eyJ1IjoibWFyaWEyMDI0IiwiYSI6ImNscXdsdGZ0dTA1aHUybG1pMnF5cnRwczcifQ.Q_g6RwM_KZr10fbD3uIBVw")
+```
+
+## Creating a map
+
+As I want to see a point and an isochrone on one map, I am creating a variable base_map to store data from leaflet.
+
+
+```{r}
+# Create a base map
+base_map <- leaflet(data = schools) %>%
+  setView(lng = calgary_coordinates[2], lat = calgary_coordinates[1], zoom = 10) %>%
+  addProviderTiles("OpenStreetMap.Mapnik") %>%
+  addMarkers(
+    lat = ~latitude,
+    lng = ~longitude,
+    popup = paste0(
+      "<b>City: </b>", 'Calgary', "<br>",
+      "<b>Name: </b>", schools$school, "<br>",
+      "<b>Level: </b>", schools$level, "<br>",
+      "<b>Grade: </b>", schools$max_grade, "<br>"
+    )
+  )
+```
+
+## Add isochrone polygons using mapdeck
+Here we need a loop, where:
+
+First step is to map the name, lon and lat of each school, because in this case mapdeck doesn't know the location of each school clearly.
+
+Second step is to calculate isochrone for the school
+
+And final one is to add isochrone polygons to the map
+```{r}
+# A loop through schools to add isochrone polygons
+for (i in seq_len(nrow(schools))) {
+  school_name <- schools$school[i]
+  lon <- schools$longitude[i]
+  lat <- schools$latitude[i]
+  
+  # calculating isochrone for the current school
+  isochrone <- mb_isochrone(paste(lon, lat, sep = ","), profile = "driving", time = 3)
+  
+  # adding isochrone polygons to the map
+  base_map <- base_map %>%
+    addPolygons(
+      data = isochrone,
+      fillColor = "violet",
+      fillOpacity = 0.25,
+      layerId = paste("isochrone_", school_name),
+      group = "Isochrones"
+    )
+}
+```
+## Option to turn on and off isochrone map and showing the final map
+
+To be able to focus on points only, I can turn off isochrone layer by adding a control.
+To see the map I just call the variable base_map.
+
+```{r}
+# layer control
+base_map <- base_map %>%
+  addLayersControl(
+    overlayGroups = c("Isochrones"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+# final map
+base_map
+```
+
+
