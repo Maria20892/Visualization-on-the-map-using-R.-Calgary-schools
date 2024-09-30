@@ -36,4 +36,4 @@ The project was created using R and the following libraries:
 
 ## View the Interactive Map
 
-You can view the interactive map [here]([https://your-username.github.io/your-repository/final_map.html](https://maria20892.github.io/Visualization-on-the-map-using-R.-Calgary-schools/final_map.html)).
+You can view the interactive map [here](https://maria20892.github.io/Visualization-on-the-map-using-R.-Calgary-schools/final_map.html).
