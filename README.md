@@ -20,16 +20,16 @@ The project was created using R and the following libraries:
 
 ## Steps and Methodology
 1. **Data Preparation:**
-  * A dataset containing the names, latitudes, longitudes, levels, and grades of schools in Calgary was created.
-  * The data was used to plot points on a map representing the locations of the schools.
+   * A dataset containing the names, latitudes, longitudes, levels, and grades of schools in Calgary was created.
+   * The data was used to plot points on a map representing the locations of the schools.
 
 2. **Map Creation:**
-  * A leaflet map was created with each school represented by a point.
-  * Pop-ups were added to display the name, city, level, and grade of each school when clicked.
+   * A leaflet map was created with each school represented by a point.
+   * Pop-ups were added to display the name, city, level, and grade of each school when clicked.
 
 3. **Isochrone Generation:**
-  * For each school, a 3-minute driving isochrone was calculated using the Mapbox API.
-  * Isochrone polygons were added to the map to visualize the areas accessible within a 3-minute drive.
+   * For each school, a 3-minute driving isochrone was calculated using the Mapbox API.
+   * Isochrone polygons were added to the map to visualize the areas accessible within a 3-minute drive.
 
 4. **Layer Control:**
-  * A control was added to allow users to toggle the visibility of the isochrones, making the map more interactive.
+   * A control was added to allow users to toggle the visibility of the isochrones, making the map more interactive.
