@@ -33,3 +33,7 @@ The project was created using R and the following libraries:
 
 4. **Layer Control:**
    * A control was added to allow users to toggle the visibility of the isochrones, making the map more interactive.
+
+## View the Interactive Map
+
+You can view the interactive map [here]([https://your-username.github.io/your-repository/final_map.html](https://maria20892.github.io/Visualization-on-the-map-using-R.-Calgary-schools/final_map.html)).
